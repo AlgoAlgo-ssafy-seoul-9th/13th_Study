@@ -60,6 +60,37 @@ print(''.join(post_lst))
 ### [병국](./트리순회/병국.py)
 
 ```py
+def make_tree(node):
+    if node == '.':
+        return ''
+    return node + make_tree(left[node]) + make_tree(right[node])
+
+
+def mid(node):
+    if node == '.':
+        return ''
+    return mid(left[node])+node+mid(right[node])
+
+def post(node):
+    if node == '.':
+        return ''
+    return post(left[node])+post(right[node])+node
+
+
+n = int(input())
+tree = []
+left = {}
+right = {}
+
+for i in range(n):
+    a, b, c = input().split()
+    left[a] = b
+    right[a] = c
+# print(left)
+# print(right)
+print(make_tree('A'))
+print(mid('A'))
+print(post('A'))
 
 ```
 
@@ -92,19 +123,19 @@ def inorder(root):
         inorder(tree[root][0])
         print(root, end='') # root
         inorder(tree[root][1])
-        
+
 def postorder(root):
     if root != '.':
         postorder(tree[root][0])
         postorder(tree[root][1])
         print(root, end='') # root
-        
 
-preorder("A")    
+
+preorder("A")
 print()
-inorder("A")    
+inorder("A")
 print()
-postorder("A")    
+postorder("A")
 
 ```
 
@@ -202,6 +233,29 @@ for _ in range(T):
 
 ```py
 
+T = int(input())
+for _ in range(T):
+    n = int(input())
+    arr = [list(map(int,input().split())) for _ in range(2)]
+    dp = [[0]*n for _ in range(2)]
+    dir = [(0,1),(1,0),(-1,0),(0,-1)]
+    dp[0][0] = arr[0][0]
+    dp[1][0] = arr[1][0]
+    for j in range(1,n):
+        for i in range(2):
+            if j == 1:
+                if i == 0:
+                    dp[i][j] = arr[i][j]+dp[i+1][j-1]
+                else:
+                    dp[i][j] = arr[i][j]+dp[i-1][j-1]
+            else:
+                if i == 0:
+                    dp[i][j] = max(dp[i+1][j-1]+arr[i][j],arr[i][j]+dp[i+1][j-2])
+                else:
+                    dp[i][j] = max(dp[i-1][j-1]+arr[i][j],arr[i][j]+dp[i-1][j-2])
+    print(max(dp[0][-1],dp[1][-1]))
+
+
 ```
 
 ## [상미](./스티커/상미.py)
@@ -283,7 +337,69 @@ if __name__ == "__main__":
 ## [병국](./양%20구출%20작전/병국.py)
 
 ```py
+import sys
 
+sys.setrecursionlimit(10**8)
+
+input = sys.stdin.readline
+def find_one(node,now):
+    if node == 1:
+        return now
+    else:
+        # 늑대가 아니라면 패스하고
+        if animal[tree[node]] >= 0:
+            return find_one(tree[node],now)
+        # 늑대걸리면
+        else:
+            # 양 수 - 늑대 수 해주고,
+            tmp = now + animal[tree[node]]
+
+            # 양이 더 많으면 ?
+            if tmp >= 0:
+                # 늑대 없애준다
+                animal[tree[node]] = 0
+                return find_one(tree[node],tmp)
+
+            # 늑대가 더 많으면 ?
+            else:
+                # 양 수 만큼 빼놓고 끝내자
+                animal[tree[node]] += animal[node]
+                return find_one(1,0)
+    # print(animal)
+
+
+def dfs(node):
+    if animal[node] > 0:
+        sheep = animal[node]
+    else:
+        sheep = 0
+    for i in tree[node]:
+        sheep += dfs(i)
+    # 늑대면
+    if animal[node] < 0:
+        sheep = max(0,sheep+animal[node])
+    return sheep
+
+
+# 섬의 개수 n을 입력받음
+n = int(input())
+# w 인 경우 늑대
+# s 인 경우 양
+tree = [[] for _ in range(n+1)]
+animal = [0 for _ in range(n+1)]
+
+for i in range(2,n+1):
+    t,a,p = input().split()
+    a,p = int(a),int(p)
+    if t == 'S':
+        animal[i] = a
+    else:
+        animal[i] = -a
+    tree[p].append(i)
+
+
+answer = dfs(1)
+print(answer)
 ```
 
 ## [상미](./양%20구출%20작전/상미.py)
